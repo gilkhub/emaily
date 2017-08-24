@@ -13,6 +13,9 @@ class Header extends Component {
       default: // Logged in is the last case
         return [
           <li key="1"><Payments /></li>,
+          <li key="3" style={{ margin: '0 10px' }}> {/* Shorthand for '0px' from top & bottom, '10px' from right & left} */}
+            Credits: {this.props.auth.credits}
+          </li>,
           <li key="2"><a href="/api/logout">Logout</a></li>
         ];
     }
