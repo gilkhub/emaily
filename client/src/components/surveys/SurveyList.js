@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchSurveys } from '../../actions';
+import { fetchSurveys, deleteSurvey } from '../../actions';
+// deleteSurvey is WIP, remove all references if neeeded
 
 class SurveyList extends Component {
   componentDidMount() {
@@ -12,9 +13,18 @@ class SurveyList extends Component {
       return (
         <div className="card blue-grey darken-1" key={survey._id}>
           <div className="card-content white-text">
-            <span className="card-title">{survey.title}</span>
+            <span className="card-title">
+              <button className="btn-flat right red-text btn-large"
+              style={{ margin: '0px 0px 0px 0px' }}
+              onClick={() => deleteSurvey(survey._id)}
+              >
+                <i className="material-icons">delete</i>
+              </button>{survey.title}</span>
             <p>
               {survey.body}
+            </p>
+            <p>
+              {survey._id}
             </p>
             <p className="right">
               Sent On: {new Date(survey.dateSent).toLocaleDateString()}
