@@ -18,9 +18,32 @@ module.exports = app => {
     res.send(surveys);
   });
 
-  app.get('/api/surveys/:surveyId/:choice', (req, res) => {
-    res.send('Thanks for voting!');
-  });
+  // app.delete('/api/surveys/delete/:surveyId', requireLogin, async (req, res) => {
+  // app.post('/api/surveys/delete/:surveyId', requireLogin, async (req, res) => {
+  // app.post('/api/surveys/delete', requireLogin, async (req, res) => {
+  //   console.log("HELLllllloooo");
+  //   const p = new Path('/api/surveys/delete/:surveyId');
+  //   debugger;
+  //   const match = p.test(new URL(url).pathname);
+  //   if (match) {
+  //     const surveyId = match.surveyId;
+  //     const deletedSurvey = await Survey.findOneAndRemove(
+  //       { _id: surveyId },
+  //       function (err, surveyId) {
+  //         if (err) {
+  //           console.log('ERROR! FAILED TO DELETE');
+  //           res.status(555).send();
+  //         } else {
+  //           return surveyId;
+  //         }
+  //       });
+  //       debugger;
+  //     res.send(deletedSurvey);
+  //   } else {
+  //     console.log('ERROR! FAILED TO FIND ITEM TO DELETE');
+  //     res.status(9595).send();
+  //   }
+  // });
 
   app.post('/api/surveys/webhooks', (req, res) => {
     const p = new Path('/api/surveys/:surveyId/:choice');
@@ -81,4 +104,31 @@ module.exports = app => {
       res.status(422).send(err);
     }
   });
+
+  app.delete('/api/surveys/:surveyId', requireLogin, async (req, res) => {
+    console.log(`In delete survey endpoint, param id is: ${req.params.surveyId}`);
+
+    if (req.params.surveyId) {
+      await Survey.findOneAndRemove(
+        { _id: req.params.surveyId },
+        function (err, survey) {
+          if (err) {
+            console.log(`ERROR! FAILED TO DELETE!\n${err}\n`);
+            res.status(500).send({});
+          } else {
+            if (survey) {
+              console.log(`Found and deleted the following record -> \n${survey}\n`);
+            } else {
+              console.log(`A survey with id ${req.params.surveyId} was not found, cannot delete.\n`);
+            }
+            res.send(survey); // could basically send just survey.id to avoid sending long recipients document with it
+          }
+        }
+      );
+    } else {
+      console.log('ERROR! PARAMS DID NOT INCLUDE surveyId TO DELETE');
+      res.status(500).send({});
+    }
+  });
+
 };
