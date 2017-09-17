@@ -1,10 +1,35 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchSurveys, deleteSurvey } from '../../actions';
+import { fetchSurveys, deleteSurvey, showDeleteSurveyAlert, hideDeleteSurveyAlert } from '../../actions';
+const SweetAlert = require('react-bootstrap-sweetalert');
 
 class SurveyList extends Component {
   componentDidMount() {
     this.props.fetchSurveys();
+  }
+
+  deleteSurveyAndHideAlert() {
+    this.props.deleteSurvey(this.props.alerts.surveyId);
+    this.props.hideDeleteSurveyAlert();
+  }
+
+  renderDeleteAlert() {
+    if (this.props.alerts.showDeleteAlert) {
+      return (
+        <SweetAlert
+          warning
+          showCancel
+          confirmBtnText="Yes, delete it!"
+          confirmBtnBsStyle="danger"
+          cancelBtnBsStyle="default"
+          title="Are you sure you want to delete this survey?"
+          onConfirm={this.deleteSurveyAndHideAlert}
+          onCancel={this.props.hideDeleteAlert}
+        >
+          You will not be able to recover this imaginary file!
+        </SweetAlert>
+      );
+    }
   }
 
   renderSurveys() {
@@ -14,8 +39,8 @@ class SurveyList extends Component {
           <div className="card-content white-text">
             <span className="card-title">
               <button className="btn-flat right red-text btn-large"
-              style={{ margin: '0px 0px 0px 0px' }}
-              onClick={() => this.props.deleteSurvey(survey._id)}
+                      style={{ margin: '0px 0px 0px 0px' }}
+                      onClick={() => this.props.showDeleteSurveyAlert(survey._id)}
               >
                 <i className="material-icons">delete</i>
               </button>{survey.title}</span>
@@ -38,10 +63,15 @@ class SurveyList extends Component {
     });
   }
 
-  render(){
+  render() {
     return(
       <div>
-        {this.renderSurveys()}
+        <div>
+          {this.renderDeleteAlert()}
+        </div>
+        <div>
+          {this.renderSurveys()}
+        </div>
       </div>
     );
   }
@@ -52,8 +82,10 @@ class SurveyList extends Component {
 // return { surveys: state.surveys }
 // }
 // // is equivalent to:
-function mapStateToProps({ surveys }) {
-  return { surveys };
+function mapStateToProps({ surveys, alerts }) {
+  return { surveys, alerts };
 }
 
-export default connect(mapStateToProps, { fetchSurveys, deleteSurvey })(SurveyList);
+export default connect(
+  mapStateToProps,
+  { fetchSurveys, deleteSurvey, showDeleteSurveyAlert, hideDeleteSurveyAlert })(SurveyList);
